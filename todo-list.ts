@@ -1,14 +1,13 @@
-import { LitElement, html, css } from "lit";
-import { customElement, state, query } from "lit/decorators.js";
+import {LitElement, html, css} from 'lit';
+import {customElement, state, property, query} from 'lit/decorators.js';
 
 type ToDoItem = {
-  text: string;
-  completed: boolean;
+  text: string,
+  completed: boolean
 };
 
-@customElement("todo-list")
+@customElement('todo-list')
 export class ToDoList extends LitElement {
-  // TODO: Add styles here
   static styles = css`
     .completed {
       text-decoration-line: line-through;
@@ -18,26 +17,53 @@ export class ToDoList extends LitElement {
 
   @state()
   private _listItems = [
-    { text: "Make to-do list", completed: true },
-    { text: "Add some styles", completed: false },
+    { text: 'Make to-do list', completed: true },
+    { text: 'Complete Lit tutorial', completed: false }
   ];
+  @property()
+  hideCompleted = false;
 
   render() {
-    return html`
-      <h2>To Do</h2>
+    // TODO: Replace items definition.
+const items = this.hideCompleted
+  ? this._listItems.filter((item) => !item.completed)
+  : this._listItems; 
+    const todos = html`
       <ul>
-        ${this._listItems.map(
-          (item) =>
-            html` <li
-              class=${item.completed ? "completed" : ""}
-              @click=${() => this.toggleCompleted(item)}
-            >
+        ${items.map((item) =>
+          html`
+            <li
+                class=${item.completed ? 'completed' : ''}
+                @click=${() => this.toggleCompleted(item)}>
               ${item.text}
             </li>`
         )}
       </ul>
-      <input id="newitem" aria-label="New item" />
+    `;
+    // TODO: Define partial templates
+    const caughtUpMessage = html`
+  <p>
+  You're all caught up!
+  </p>
+`;
+const todosOrMessage = items.length > 0
+  ? todos
+  : caughtUpMessage;
+    return html`
+      <h2>To Do</h2>
+      <!-- TODO: Update expression. -->
+      ${todosOrMessage}
+      <input id="newitem" aria-label="New item">
       <button @click=${this.addToDo}>Add</button>
+      <br>
+      <label>
+        <input type="checkbox"
+          @change=${this.setHideCompleted}
+          ?checked=${this.hideCompleted}>
+        Hide completed
+      </label>
+
+
     `;
   }
 
@@ -46,14 +72,17 @@ export class ToDoList extends LitElement {
     this.requestUpdate();
   }
 
-  @query("#newitem")
+  setHideCompleted(e: Event) {
+    this.hideCompleted = (e.target as HTMLInputElement).checked;
+  }
+
+  @query('#newitem')
   input!: HTMLInputElement;
 
   addToDo() {
-    this._listItems = [
-      ...this._listItems,
-      { text: this.input.value, completed: false },
-    ];
-    this.input.value = "";
+    this._listItems = [...this._listItems,
+        {text: this.input.value, completed: false}];
+    this.input.value = '';
   }
 }
+
