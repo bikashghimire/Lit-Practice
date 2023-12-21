@@ -28,7 +28,10 @@ export class ToDoList extends LitElement {
       <ul>
         ${this._listItems.map(
           (item) =>
-            html` <li class="TODO" @click=${() => this.toggleCompleted(item)}>
+            html` <li
+              class=${item.completed ? "completed" : ""}
+              @click=${() => this.toggleCompleted(item)}
+            >
               ${item.text}
             </li>`
         )}
